@@ -32,12 +32,30 @@ public:
 private:
 	HFONT hFontSW;
 	HCURSOR hDefaultCursor;
+	int iID_test;
+	void (*vFunction_test)(SimpleWindow *sw);
 
 	void InitControls();
 	void FixCursor(HWND hWnd, UINT Msg);
 	void SetFont(int iID);
 	int GetWidth(const char *cText);
 	int GetHeight(const char *cText);
+
+	class IDTable {
+	private:
+		int id;
+		void (*ft)(SimpleWindow *sw);
+		IDTable *next;
+
+	public:
+		IDTable();
+		IDTable(int iID, void (*vFunction)(SimpleWindow *sw));
+		~IDTable();
+		void Add(int iID, void (*vFunction)(SimpleWindow *sw));
+		SimpleWindow::IDTable* Find(SimpleWindow *sw, int iID);
+	};
+
+	IDTable idtable;
 
 public:
 	void Button(int iID, int X, int Y, const char *cText, int iWidth = 0, int iHeight = 0);
@@ -48,6 +66,8 @@ public:
 	LRESULT ReadOnly(int iID, bool bReadOnly = true);
 	BOOL SetText(int iID, const char *cText);
 	void GetText(int iID, std::string &out);
+	void SetFunction(int iID, void (*vFunction)(SimpleWindow *sw));
+
 };
 
 #endif

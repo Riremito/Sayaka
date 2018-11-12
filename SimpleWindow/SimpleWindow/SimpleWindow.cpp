@@ -83,7 +83,7 @@ LRESULT CALLBACK SimpleWindow::SimpleWindowProc(HWND hWnd, UINT Msg, WPARAM wPar
 	case WM_COMMAND:
 	{
 		SimpleWindow *sw = (SimpleWindow *)GetWindowLongA(hWnd, GWL_USERDATA);
-		//sw->CommandControls();
+		sw->idtable.Find(sw, LOWORD(wParam));
 		break;
 	}
 

@@ -137,3 +137,51 @@ void SimpleWindow::GetText(int iID, std::string &out) {
 
 	delete[] cText;
 }
+
+void SimpleWindow::SetFunction(int iID, void (*vFunction)(SimpleWindow *sw)) {
+	idtable.Add(iID, vFunction);
+}
+
+SimpleWindow::IDTable::IDTable() {
+	id = -1;
+	ft = NULL;
+	next = NULL;
+}
+
+SimpleWindow::IDTable::IDTable(int iID, void (*vFunction)(SimpleWindow *sw)) {
+	id = iID;
+	ft = vFunction;
+	next = NULL;
+}
+
+SimpleWindow::IDTable::~IDTable() {
+	if (next) {
+		delete next;
+	}
+}
+
+void SimpleWindow::IDTable::Add(int iID, void( *vFunction)(SimpleWindow *sw)) {
+	if (ft == NULL && id == -1 && next == NULL) {
+		id = iID;
+		ft = vFunction;
+	}
+	else {
+		if (next == NULL) {
+			next = new IDTable(iID, vFunction);
+		}
+		else {
+			return next->Add(iID, vFunction);
+		}
+	}
+}
+
+SimpleWindow::IDTable* SimpleWindow::IDTable::Find(SimpleWindow *sw, int iID) {
+	if (id == iID) {
+		ft(sw);
+		return this;
+	}
+	if (next) {
+		return next->Find(sw, iID);
+	}
+	return NULL;
+}
