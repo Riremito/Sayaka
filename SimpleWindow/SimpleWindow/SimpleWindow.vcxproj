@@ -157,7 +157,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="SimpleControls.cpp" />
     <ClCompile Include="SimpleWindow.cpp" />
   </ItemGroup>
   <ItemGroup>

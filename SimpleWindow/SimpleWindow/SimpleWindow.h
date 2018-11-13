@@ -12,26 +12,29 @@
 #include<string>
 
 class SimpleWindow {
-	// Main
+	/*
+		メインウィンドウ
+	*/
 private:
 	HINSTANCE hInstanceSW;
 	HWND hWndSW;
-	void (*CreateControls)(SimpleWindow *sw);
-	void (*CommandControls)(SimpleWindow *sw);
-	void (*NotifyControls)(SimpleWindow *sw);
+	void(*CreateControls)(SimpleWindow *sw);
 
 	static LRESULT CALLBACK SimpleWindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 	void AdjustWindow(HWND hWnd, int nWidth, int nHeight);
 
 public:
-	SimpleWindow(HINSTANCE hInstance, const char *cTitle = "SimpleWindow", int iWidth = 800, int iHeight = 600, void (*vCreateControls)(SimpleWindow *sw) = NULL);
+	SimpleWindow(HINSTANCE hInstance, const char *cTitle = "SimpleWindow", int iWidth = 800, int iHeight = 600, void(*vCreateControls)(SimpleWindow *sw) = NULL);
 	~SimpleWindow();
 	HWND GetHWND();
 
-	// Sub
+	/*
+		コントロール
+	*/
 private:
 	HFONT hFontSW;
 	HCURSOR hDefaultCursor;
+
 	int iID_test;
 	void (*vFunction_test)(SimpleWindow *sw);
 
@@ -53,10 +56,8 @@ private:
 		~IDTable();
 		void Add(int iID, void (*vFunction)(SimpleWindow *sw));
 		SimpleWindow::IDTable* Find(SimpleWindow *sw, int iID);
-	};
-
-	IDTable idtable;
-
+	} idtable;
+	
 public:
 	void Button(int iID, int X, int Y, const char *cText, int iWidth = 0, int iHeight = 0);
 	void CheckBox(int iID, int X, int Y, const char *cText);
@@ -67,7 +68,7 @@ public:
 	BOOL SetText(int iID, const char *cText);
 	void GetText(int iID, std::string &out);
 	void SetFunction(int iID, void (*vFunction)(SimpleWindow *sw));
-
+	bool CheckBoxStatus(int iID);
 };
 
 #endif
