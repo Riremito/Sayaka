@@ -10,7 +10,8 @@ enum ID {
 	CHECKBOX_TEST,
 	EDITBOX_TEST,
 	STATICTEXT_TEST,
-	EDITBOX_TEST2
+	EDITBOX_TEST2,
+	LISTVIEW_TEST
 };
 
 void Button(SimpleWindow *sw) {
@@ -27,6 +28,8 @@ void Button(SimpleWindow *sw) {
 
 		sw->SetText(EDITBOX_TEST2, edit2.c_str());
 	}
+
+	sw->AddItem(LISTVIEW_TEST, "test");
 }
 
 void CheckBox(SimpleWindow *sw) {
@@ -47,11 +50,16 @@ void CreateControls(SimpleWindow *sw) {
 	sw->SetText(EDITBOX_TEST, "テキスト");
 	sw->EditBox(EDITBOX_TEST2, 3, 160, NULL, 400 - 6, 10);
 	sw->ReadOnly(EDITBOX_TEST2, true);
+
+	sw->ListView(LISTVIEW_TEST, 400, 3);
+	sw->AddHeader(LISTVIEW_TEST, "項目1", 100);
+	sw->AddHeader(LISTVIEW_TEST, "項目2", 100);
+	sw->AddHeader(LISTVIEW_TEST, "項目3", 100);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 
-	SimpleWindow sw(hInstance, "TestSimpleWindow", 400, 300, CreateControls);
+	SimpleWindow sw(hInstance, "TestSimpleWindow", 800, 600, CreateControls);
 
 	return 0;
 }

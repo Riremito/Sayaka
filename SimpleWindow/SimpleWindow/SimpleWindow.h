@@ -55,7 +55,7 @@ private:
 		IDTable(int iID, void (*vFunction)(SimpleWindow *sw));
 		~IDTable();
 		void Add(int iID, void (*vFunction)(SimpleWindow *sw));
-		SimpleWindow::IDTable* Find(SimpleWindow *sw, int iID);
+		IDTable* Find(SimpleWindow *sw, int iID);
 	} idtable;
 	
 public:
@@ -69,6 +69,36 @@ public:
 	void GetText(int iID, std::string &out);
 	void SetFunction(int iID, void (*vFunction)(SimpleWindow *sw));
 	bool CheckBoxStatus(int iID);
+
+	/*
+		ÉRÉìÉgÉçÅ[Éã
+	*/
+private:
+
+	class HWNDTable {
+	private:
+		HWNDTable *next;
+
+	public:
+		int id;
+		HWND hwnd;
+		int headercount;
+		int line;
+		int item;
+
+		HWNDTable();
+		HWNDTable(int iID, HWND hWnd);
+		~HWNDTable();
+		void Add(int iID , HWND hWnd);
+		HWNDTable* Find(int iID);
+		void Header(int iID);
+		int GetHC(int iID);
+	} hwndtable;
+
+public:
+	void ListView(int iID, int X, int Y, int iWidth = 394, int iHeight = 294);
+	void AddHeader(int iID, const char *cText, int iWidth);
+	void AddItem(int iID, const char *cText);
 };
 
 #endif
