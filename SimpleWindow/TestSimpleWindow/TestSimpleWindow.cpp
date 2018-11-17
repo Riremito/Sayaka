@@ -11,7 +11,8 @@ enum ID {
 	EDITBOX_TEST,
 	STATICTEXT_TEST,
 	EDITBOX_TEST2,
-	LISTVIEW_TEST
+	LISTVIEW_TEST,
+	LISTVIEW_TEST2
 };
 
 void Button(SimpleWindow *sw) {
@@ -28,8 +29,11 @@ void Button(SimpleWindow *sw) {
 
 		sw->SetText(EDITBOX_TEST2, edit2.c_str());
 	}
-
-	sw->AddItem(LISTVIEW_TEST, "test");
+	std::string output;
+	//sw->AddItem(LISTVIEW_TEST, "test");
+	if (sw->GetItem(LISTVIEW_TEST, 1, output)) {
+		sw->AddItem(LISTVIEW_TEST2, output.c_str());
+	}
 }
 
 void CheckBox(SimpleWindow *sw) {
@@ -55,9 +59,20 @@ void CreateControls(SimpleWindow *sw) {
 	sw->AddHeader(LISTVIEW_TEST, "€–Ú1", 100);
 	sw->AddHeader(LISTVIEW_TEST, "€–Ú2", 100);
 	sw->AddHeader(LISTVIEW_TEST, "€–Ú3", 100);
+	sw->AddItem(LISTVIEW_TEST, "test1");
+	sw->AddItem(LISTVIEW_TEST, "test2");
+	sw->AddItem(LISTVIEW_TEST, "test3");
+	sw->AddItem(LISTVIEW_TEST, "test4");
+	sw->AddItem(LISTVIEW_TEST, "test5");
+	sw->AddItem(LISTVIEW_TEST, "test6");
+
+	sw->ListView(LISTVIEW_TEST2, 400, 300);
+	sw->AddHeader(LISTVIEW_TEST2, "X", 100);
+	sw->AddHeader(LISTVIEW_TEST2, "Y", 100);
+	sw->AddHeader(LISTVIEW_TEST2, "Z", 100);
 }
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE/* hPrevInstance*/, LPSTR/* lpCmdLine*/, int/* nCmdShow*/) {
 
 	SimpleWindow sw(hInstance, "TestSimpleWindow", 800, 600, CreateControls);
 

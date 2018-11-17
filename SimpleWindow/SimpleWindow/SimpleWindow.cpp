@@ -109,11 +109,8 @@ HWND SimpleWindow::GetHWND() {
 */
 
 void SimpleWindow::InitControls() {
-
 	hDefaultCursor = LoadCursorA(NULL, IDC_ARROW);
 	hFontSW = CreateFontA(12, NULL, NULL, NULL, FW_NORMAL, NULL, NULL, NULL, SHIFTJIS_CHARSET, NULL, NULL, NULL, NULL, "MS Gothic");
-
-	InitCommonControls();
 }
 
 void SimpleWindow::FixCursor(HWND hWnd, UINT Msg) {
@@ -235,13 +232,13 @@ BOOL SimpleWindow::SetText(int iID, const char *cText) {
 	return SetDlgItemTextA(hWndSW, iID, cText);
 }
 
-void SimpleWindow::GetText(int iID, std::string &out) {
+void SimpleWindow::GetText(int iID, std::string &output) {
 	DWORD dwLength = SendDlgItemMessageA(hWndSW, iID, WM_GETTEXTLENGTH, NULL, NULL);
 	char *cText = new char[dwLength + 1];
 
 	GetDlgItemTextA(hWndSW, iID, cText, dwLength + 1);
 
-	out = cText;
+	output = cText;
 
 	delete[] cText;
 }
@@ -303,138 +300,53 @@ SimpleWindow::IDTable* SimpleWindow::IDTable::Find(SimpleWindow *sw, int iID) {
 }
 
 void SimpleWindow::ListView(int iID, int X, int Y, int iWidth, int iHeight) {
-	HWND hWndLV = CreateWindowExA(NULL, "SysListView32", NULL, LVS_REPORT | WS_CHILD /*| LVS_NOSORTHEADER*/ | WS_BORDER | LVS_SINGLESEL | LVS_SHOWSELALWAYS, X, Y, iWidth, iHeight, hWndSW, NULL, NULL, NULL);
-	
-	hwndtable.Add(iID, hWndLV);
-
-	SendMessageA(hWndLV, WM_SETFONT, (WPARAM)hFontSW, NULL);
-
-	//1行選択
-	DWORD dwExStyle = ListView_GetExtendedListViewStyle(hWndLV) | LVS_EX_FULLROWSELECT;
-	ListView_SetExtendedListViewStyle(hWndLV, dwExStyle);
-
-	//グリッド線
-	dwExStyle = ListView_GetExtendedListViewStyle(hWndSW) | LVS_EX_GRIDLINES;
-	ListView_SetExtendedListViewStyle(hWndLV, dwExStyle);
-	ShowWindow(hWndLV, SW_SHOW);
+	if (!listview) {
+		InitCommonControls();
+		listview = new SimpleListView(hWndSW, iID, X, Y, iWidth, iHeight);
+	}
+	else {
+		listview->next = new SimpleListView(hWndSW, iID, X, Y, iWidth, iHeight);
+	}
 }
 
 void SimpleWindow::AddHeader(int iID, const char *cText, int iWidth) {
-	LVCOLUMNA lvc;
-
-	ZeroMemory(&lvc, sizeof(lvc));
-
-	lvc.mask = LVCF_FMT | LVCF_TEXT | LVCF_SUBITEM | LVCF_WIDTH;
-	lvc.fmt = LVCFMT_LEFT /*| LVCFMT_FIXED_WIDTH*/;
-	lvc.pszText = (char *)cText;
-	lvc.cx = iWidth;
-	lvc.iSubItem = hwndtable.Find(iID)->headercount;
-
-	HWND hWndLV = hwndtable.Find(iID)->hwnd;
-
-	if (hWndLV) {
-		ListView_InsertColumn(hWndLV, hwndtable.Find(iID)->headercount, &lvc);
-		hwndtable.Header(iID);
-	}
-}
-
-
-void SimpleWindow::AddItem(int iID, const char *cText) {
-	LVITEMA item;
-	if (hwndtable.Find(iID)->item && hwndtable.Find(iID)->item % hwndtable.Find(iID)->headercount == 0) {
-		hwndtable.Find(iID)->line++;
-	}
-
-
-	item.mask = LVIF_TEXT;
-	item.iItem = hwndtable.Find(iID)->line;
-	item.iSubItem = hwndtable.Find(iID)->item % hwndtable.Find(iID)->headercount;
-	item.pszText = (char *)cText;
-
-	if (hwndtable.Find(iID)->item % hwndtable.Find(iID)->headercount == 0) {
-		ListView_InsertItem(hwndtable.Find(iID)->hwnd, &item);
-	}
-	else {
-		ListView_SetItem(hwndtable.Find(iID)->hwnd, &item);
-	}
-
-	ListView_EnsureVisible(hwndtable.Find(iID)->hwnd, hwndtable.Find(iID)->line, true);
-
-	hwndtable.Find(iID)->item++;
-}
-
-/*
-	リストテーブル
-*/
-SimpleWindow::HWNDTable::HWNDTable() {
-	id = -1;
-	hwnd = NULL;
-	next = NULL;
-	headercount = 0;
-	line = 0;
-	item = 0;
-}
-
-SimpleWindow::HWNDTable::HWNDTable(int iID, HWND hWnd) {
-	id = iID;
-	hwnd = hWnd;
-	next = NULL;
-	headercount = 0;
-}
-
-SimpleWindow::HWNDTable::~HWNDTable() {
-	if (next) {
-		delete next;
-	}
-}
-
-void SimpleWindow::HWNDTable::Add(int iID, HWND hWnd) {
-	if (hwnd == NULL && id == -1 && next == NULL) {
-		id = iID;
-		hwnd = hWnd;
-	}
-	else {
-		if (next == NULL) {
-			next = new HWNDTable(iID, hWnd);
-		}
-		else {
-			return next->Add(iID, hWnd);
-		}
-	}
-}
-
-SimpleWindow::HWNDTable* SimpleWindow::HWNDTable::Find(int iID) {
-	if (id == iID) {
-		return this;
-	}
-
-	if (next) {
-		return next->Find(iID);
-	}
-
-	return NULL;
-}
-
-void SimpleWindow::HWNDTable::Header(int iID) {
-	if (id == iID) {
-		headercount++;
+	if (!listview) {
 		return;
 	}
 
-	if (next) {
-		return next->Header(iID);
+	SimpleListView *slv = listview->Find(iID);
+
+	if (!slv) {
+		return;
 	}
+
+	slv->AddHeader(cText, iWidth);
 }
 
-
-int SimpleWindow::HWNDTable::GetHC(int iID) {
-	if (id == iID) {
-		return headercount;
+void SimpleWindow::AddItem(int iID, const char *cText) {
+	if (!listview) {
+		return;
 	}
 
-	if (next) {
-		return next->GetHC(iID);
+	SimpleListView *slv = listview->Find(iID);
+
+	if (!slv) {
+		return;
 	}
 
-	return 0;
+	slv->AddItem(cText);
+}
+
+bool SimpleWindow::GetItem(int iID, int index, std::string &output) {
+	if (!listview) {
+		return false;
+	}
+
+	SimpleListView *slv = listview->Find(iID);
+
+	if (!slv) {
+		return false;
+	}
+
+	return slv->GetItem(index, output);
 }

@@ -11,6 +11,9 @@
 #pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include<string>
 
+class SimpleWindow;
+class SimpleListView;
+
 class SimpleWindow {
 	/*
 		メインウィンドウ
@@ -18,7 +21,7 @@ class SimpleWindow {
 private:
 	HINSTANCE hInstanceSW;
 	HWND hWndSW;
-	void(*CreateControls)(SimpleWindow *sw);
+	void (*CreateControls)(SimpleWindow *sw);
 
 	static LRESULT CALLBACK SimpleWindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 	void AdjustWindow(HWND hWnd, int nWidth, int nHeight);
@@ -66,7 +69,7 @@ public:
 
 	LRESULT ReadOnly(int iID, bool bReadOnly = true);
 	BOOL SetText(int iID, const char *cText);
-	void GetText(int iID, std::string &out);
+	void GetText(int iID, std::string &output);
 	void SetFunction(int iID, void (*vFunction)(SimpleWindow *sw));
 	bool CheckBoxStatus(int iID);
 
@@ -74,31 +77,37 @@ public:
 		コントロール
 	*/
 private:
-
-	class HWNDTable {
-	private:
-		HWNDTable *next;
-
-	public:
-		int id;
-		HWND hwnd;
-		int headercount;
-		int line;
-		int item;
-
-		HWNDTable();
-		HWNDTable(int iID, HWND hWnd);
-		~HWNDTable();
-		void Add(int iID , HWND hWnd);
-		HWNDTable* Find(int iID);
-		void Header(int iID);
-		int GetHC(int iID);
-	} hwndtable;
-
+	SimpleListView *listview;
 public:
 	void ListView(int iID, int X, int Y, int iWidth = 394, int iHeight = 294);
 	void AddHeader(int iID, const char *cText, int iWidth);
 	void AddItem(int iID, const char *cText);
+	bool GetItem(int iID, int index, std::string &output);
 };
+
+/*
+	リストコントロール
+*/
+class SimpleListView {
+private:
+	int id;
+	HWND hwnd;
+	int headercount;
+	int itemcount;
+	void (*notify)(SimpleWindow *sw);
+
+public:
+	SimpleListView *next;
+
+	SimpleListView(HWND hWndParent, int iID, int X, int Y, int iWidth, int iHeight);
+	~SimpleListView();
+
+	//void Notify(HWND hWnd, SimpleWindow *sw);
+	SimpleListView* Find(int iID);
+	void AddHeader(const char *cText, int iWidth);
+	void AddItem(const char *cText);
+	bool GetItem(int index, std::string &output);
+};
+
 
 #endif
