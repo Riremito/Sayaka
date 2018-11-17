@@ -94,10 +94,10 @@ private:
 	HWND hwnd;
 	int headercount;
 	int itemcount;
-	void (*notify)(SimpleWindow *sw);
 
 public:
 	SimpleListView *next;
+	void (*notify)(SimpleWindow *sw);
 
 	SimpleListView(HWND hWndParent, int iID, int X, int Y, int iWidth, int iHeight);
 	~SimpleListView();
@@ -107,6 +107,8 @@ public:
 	void AddHeader(const char *cText, int iWidth);
 	void AddItem(const char *cText);
 	bool GetItem(int index, std::string &output);
+	void SetFunction(void (*vFunction)(SimpleWindow *sw));
+	SimpleListView* FindHWND(HWND hWnd);
 };
 
 

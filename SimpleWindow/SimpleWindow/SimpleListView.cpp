@@ -72,7 +72,6 @@ void SimpleListView::AddHeader(const char *cText, int iWidth) {
 	headercount++;
 }
 
-
 void SimpleListView::AddItem(const char *cText) {
 	LVITEMA item;
 
@@ -114,4 +113,20 @@ bool SimpleListView::GetItem(int index, std::string &output) {
 	output = buf;
 
 	return true;
+}
+
+void SimpleListView::SetFunction(void (*vFunction)(SimpleWindow *sw)) {
+	notify = vFunction;
+}
+
+SimpleListView* SimpleListView::FindHWND(HWND hWnd) {
+	if (hwnd == hWnd) {
+		return this;
+	}
+
+	if (next) {
+		return next->FindHWND(hWnd);
+	}
+
+	return NULL;
 }

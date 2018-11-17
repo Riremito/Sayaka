@@ -57,6 +57,8 @@ SimpleWindow::~SimpleWindow() {
 
 LRESULT CALLBACK SimpleWindow::SimpleWindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) {
 	SimpleWindow *sw;
+	SimpleListView *slv;
+	NMHDR *nh;
 
 	switch (Msg) {
 		// ƒRƒ“ƒgƒ[ƒ‹¶¬
@@ -75,6 +77,22 @@ LRESULT CALLBACK SimpleWindow::SimpleWindowProc(HWND hWnd, UINT Msg, WPARAM wPar
 	case WM_COMMAND:
 		sw = (SimpleWindow *)GetWindowLongA(hWnd, GWL_USERDATA);
 		sw->idtable.Find(sw, LOWORD(wParam));
+		break;
+	case WM_NOTIFY:
+		nh = (NMHDR *)lParam;
+		if (nh->code == NM_CLICK) {
+
+			sw = (SimpleWindow *)GetWindowLongA(hWnd, GWL_USERDATA);
+			slv = sw->listview;
+
+			if (slv) {
+				slv = slv->FindHWND(nh->hwndFrom);
+
+				if (slv && slv->notify) {
+					slv->notify(sw);
+				}
+			}
+		}
 		break;
 
 	case WM_DESTROY:
@@ -244,6 +262,13 @@ void SimpleWindow::GetText(int iID, std::string &output) {
 }
 
 void SimpleWindow::SetFunction(int iID, void(*vFunction)(SimpleWindow *sw)) {
+	if (listview) {
+		SimpleListView *slv = listview->Find(iID);
+		if (slv) {
+			slv->SetFunction(vFunction);
+			return;
+		}
+	}
 	idtable.Add(iID, vFunction);
 }
 
@@ -299,6 +324,9 @@ SimpleWindow::IDTable* SimpleWindow::IDTable::Find(SimpleWindow *sw, int iID) {
 	return NULL;
 }
 
+/*
+	SimpleListView
+*/
 void SimpleWindow::ListView(int iID, int X, int Y, int iWidth, int iHeight) {
 	if (!listview) {
 		InitCommonControls();

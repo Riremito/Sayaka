@@ -15,6 +15,13 @@ enum ID {
 	LISTVIEW_TEST2
 };
 
+void ListView(SimpleWindow *sw) {
+	std::string output;
+	if (sw->GetItem(LISTVIEW_TEST, 0, output)) {
+		sw->AddItem(LISTVIEW_TEST2, output.c_str());
+	}
+}
+
 void Button(SimpleWindow *sw) {
 	if (sw->CheckBoxStatus(CHECKBOX_TEST)) {
 		std::string edit1, edit2;
@@ -65,6 +72,7 @@ void CreateControls(SimpleWindow *sw) {
 	sw->AddItem(LISTVIEW_TEST, "test4");
 	sw->AddItem(LISTVIEW_TEST, "test5");
 	sw->AddItem(LISTVIEW_TEST, "test6");
+	sw->SetFunction(LISTVIEW_TEST, ListView);
 
 	sw->ListView(LISTVIEW_TEST2, 400, 300);
 	sw->AddHeader(LISTVIEW_TEST2, "X", 100);
