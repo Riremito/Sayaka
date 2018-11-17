@@ -215,7 +215,7 @@ void SimpleWindow::EditBox(int iID, int X, int Y, const char *cText, int iWidth,
 	int width = iWidth ? iWidth : GetWidth(cText) + 6;
 	int height = iLine ? iLine * 12 + 4 : GetHeight(cText) + 4;
 
-	if (height > 10) {
+	if (height > 16) {
 		dwStyle |= ES_MULTILINE | WS_VSCROLL;
 
 		if (!iWidth) {

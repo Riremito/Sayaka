@@ -77,8 +77,8 @@ public:
 		ÉRÉìÉgÉçÅ[Éã
 	*/
 private:
-	SimpleListView *listview;
 public:
+	SimpleListView *listview;
 	void ListView(int iID, int X, int Y, int iWidth = 394, int iHeight = 294);
 	void AddHeader(int iID, const char *cText, int iWidth);
 	void AddItem(int iID, const char *cText);
@@ -92,10 +92,10 @@ class SimpleListView {
 private:
 	int id;
 	HWND hwnd;
-	int headercount;
 	int itemcount;
 
 public:
+	int headercount;
 	SimpleListView *next;
 	void (*notify)(SimpleWindow *sw);
 
