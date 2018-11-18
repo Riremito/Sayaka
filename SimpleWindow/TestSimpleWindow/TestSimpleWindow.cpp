@@ -18,9 +18,10 @@ enum ID {
 void ListView(SimpleWindow *sw) {
 	std::string output;
 	std::string item;
+	SimpleListView *slv = sw->ListView(LISTVIEW_TEST);
 
-	for (int i = 0; i < sw->listview->Find(LISTVIEW_TEST)->headercount; i++) {
-		if (!sw->GetItem(LISTVIEW_TEST, i, item)) {
+	for (int i = 0; i < slv->headercount; i++) {
+		if (!slv->GetItem(i, item)) {
 			return;
 		}
 		if (output.length()) {
@@ -45,9 +46,14 @@ void Button(SimpleWindow *sw) {
 		edit2 += edit1;
 
 		sw->SetText(EDITBOX_TEST2, edit2.c_str());
+		SimpleListView *slv = sw->ListView(LISTVIEW_TEST);
+		slv->Clear();
 	}
-	std::string output;
-	sw->AddItem(LISTVIEW_TEST, "test");
+	else {
+		std::string output;
+		SimpleListView *slv = sw->ListView(LISTVIEW_TEST);
+		slv->AddItem("test");
+	}
 }
 
 void CheckBox(SimpleWindow *sw) {
@@ -69,18 +75,21 @@ void CreateControls(SimpleWindow *sw) {
 	sw->EditBox(EDITBOX_TEST2, 3, 160, NULL, 400 - 6, 10);
 	sw->ReadOnly(EDITBOX_TEST2, true);
 
-	sw->ListView(LISTVIEW_TEST, 400, 3);
-	sw->AddHeader(LISTVIEW_TEST, "€–Ú1", 100);
-	sw->AddHeader(LISTVIEW_TEST, "€–Ú2", 100);
-	sw->AddHeader(LISTVIEW_TEST, "€–Ú3", 100);
-	sw->AddItem(LISTVIEW_TEST, "test1");
-	sw->AddItem(LISTVIEW_TEST, "test2");
-	sw->AddItem(LISTVIEW_TEST, "test3");
-	sw->AddItem(LISTVIEW_TEST, "test4");
-	sw->AddItem(LISTVIEW_TEST, "test5");
-	sw->AddItem(LISTVIEW_TEST, "test6");
+	SimpleListView *slv = sw->ListView(LISTVIEW_TEST, 400, 3);
+	slv->AddHeader("€–Ú1", 100);
+	slv->AddHeader("€–Ú2", 100);
+	slv->AddHeader("€–Ú3", 100);
+	slv->AddItem("test1");
+	slv->AddItem("test2");
+	slv->AddItem("test3");
+	slv->AddItem("test4");
+	slv->AddItem("test5");
+	slv->AddItem("test6");
+	slv->AddItem("test7");
+	slv->AddItem("test8");
+	slv->AddItem("test9");
 	sw->SetFunction(LISTVIEW_TEST, ListView);
-	sw->EditBox(EDITBOX_VIEWTEST, 400, 300, "a", 400 - 6);
+	sw->EditBox(EDITBOX_VIEWTEST, 400, 300, NULL, 400 - 6);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE/* hPrevInstance*/, LPSTR/* lpCmdLine*/, int/* nCmdShow*/) {

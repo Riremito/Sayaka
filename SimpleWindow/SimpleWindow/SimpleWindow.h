@@ -74,15 +74,14 @@ public:
 	bool CheckBoxStatus(int iID);
 
 	/*
-		コントロール
+		リストコントロール
 	*/
 private:
-public:
 	SimpleListView *listview;
-	void ListView(int iID, int X, int Y, int iWidth = 394, int iHeight = 294);
-	void AddHeader(int iID, const char *cText, int iWidth);
-	void AddItem(int iID, const char *cText);
-	bool GetItem(int iID, int index, std::string &output);
+	SimpleListView* FindListView(HWND hWnd);
+public:
+	SimpleListView* ListView(int iID, int X, int Y, int iWidth = 394, int iHeight = 294);
+	SimpleListView* ListView(int iID);
 };
 
 /*
@@ -93,6 +92,7 @@ private:
 	int id;
 	HWND hwnd;
 	int itemcount;
+	//int GetItemCount();
 
 public:
 	int headercount;
@@ -102,13 +102,13 @@ public:
 	SimpleListView(HWND hWndParent, int iID, int X, int Y, int iWidth, int iHeight);
 	~SimpleListView();
 
-	//void Notify(HWND hWnd, SimpleWindow *sw);
-	SimpleListView* Find(int iID);
+	SimpleListView* FindByID(int iID);
 	void AddHeader(const char *cText, int iWidth);
 	void AddItem(const char *cText);
 	bool GetItem(int index, std::string &output);
 	void SetFunction(void (*vFunction)(SimpleWindow *sw));
-	SimpleListView* FindHWND(HWND hWnd);
+	SimpleListView* FindByHWND(HWND hWnd);
+	void Clear();
 };
 
 

@@ -50,9 +50,10 @@ SimpleWindow::SimpleWindow(HINSTANCE hInstance, const char *cTitle, int iWidth, 
 	UnregisterClassA(str.c_str(), hInstance);
 }
 
-
 SimpleWindow::~SimpleWindow() {
-	// •K—v‚È‚µ
+	if (listview) {
+		delete listview;
+	}
 }
 
 LRESULT CALLBACK SimpleWindow::SimpleWindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) {
@@ -78,17 +79,16 @@ LRESULT CALLBACK SimpleWindow::SimpleWindowProc(HWND hWnd, UINT Msg, WPARAM wPar
 		sw = (SimpleWindow *)GetWindowLongA(hWnd, GWL_USERDATA);
 		sw->idtable.Find(sw, LOWORD(wParam));
 		break;
+
 	case WM_NOTIFY:
 		nh = (NMHDR *)lParam;
 		if (nh->code == NM_CLICK) {
 
 			sw = (SimpleWindow *)GetWindowLongA(hWnd, GWL_USERDATA);
-			slv = sw->listview;
+			slv = sw->FindListView(nh->hwndFrom);
 
 			if (slv) {
-				slv = slv->FindHWND(nh->hwndFrom);
-
-				if (slv && slv->notify) {
+				if (slv->notify) {
 					slv->notify(sw);
 				}
 			}
@@ -180,10 +180,11 @@ int SimpleWindow::GetWidth(const char *cText) {
 
 int SimpleWindow::GetHeight(const char *cText) {
 	int count = 1;
-
-	for (int i = 0; cText[i]; i++) {
-		if (cText[i] == '\n') {
-			count++;
+	if (cText) {
+		for (int i = 0; cText[i]; i++) {
+			if (cText[i] == '\n') {
+				count++;
+			}
 		}
 	}
 
@@ -263,7 +264,7 @@ void SimpleWindow::GetText(int iID, std::string &output) {
 
 void SimpleWindow::SetFunction(int iID, void(*vFunction)(SimpleWindow *sw)) {
 	if (listview) {
-		SimpleListView *slv = listview->Find(iID);
+		SimpleListView *slv = ListView(iID);
 		if (slv) {
 			slv->SetFunction(vFunction);
 			return;
@@ -325,56 +326,24 @@ SimpleWindow::IDTable* SimpleWindow::IDTable::Find(SimpleWindow *sw, int iID) {
 }
 
 /*
-	SimpleListView
+	ListView
 */
-void SimpleWindow::ListView(int iID, int X, int Y, int iWidth, int iHeight) {
+SimpleListView* SimpleWindow::FindListView(HWND hWnd) {
+	return listview ? listview->FindByHWND(hWnd) : listview;
+}
+
+SimpleListView* SimpleWindow::ListView(int iID, int X, int Y, int iWidth, int iHeight) {
 	if (!listview) {
 		InitCommonControls();
 		listview = new SimpleListView(hWndSW, iID, X, Y, iWidth, iHeight);
+		return listview;
 	}
 	else {
 		listview->next = new SimpleListView(hWndSW, iID, X, Y, iWidth, iHeight);
+		return listview->next;
 	}
 }
 
-void SimpleWindow::AddHeader(int iID, const char *cText, int iWidth) {
-	if (!listview) {
-		return;
-	}
-
-	SimpleListView *slv = listview->Find(iID);
-
-	if (!slv) {
-		return;
-	}
-
-	slv->AddHeader(cText, iWidth);
-}
-
-void SimpleWindow::AddItem(int iID, const char *cText) {
-	if (!listview) {
-		return;
-	}
-
-	SimpleListView *slv = listview->Find(iID);
-
-	if (!slv) {
-		return;
-	}
-
-	slv->AddItem(cText);
-}
-
-bool SimpleWindow::GetItem(int iID, int index, std::string &output) {
-	if (!listview) {
-		return false;
-	}
-
-	SimpleListView *slv = listview->Find(iID);
-
-	if (!slv) {
-		return false;
-	}
-
-	return slv->GetItem(index, output);
+SimpleListView* SimpleWindow::ListView(int iID) {
+	return listview ? listview->FindByID(iID) : listview;
 }
