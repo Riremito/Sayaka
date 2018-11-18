@@ -54,10 +54,10 @@ void SimpleListView::AddItem(const char *cText) {
 	item.pszText = (char *)cText;
 
 	if (itemcount % headercount == 0) {
-		SendMessageA(hwnd, LVM_INSERTITEM, 0, (LPARAM)&item);
+		SendMessageA(hwnd, LVM_INSERTITEM, NULL, (LPARAM)&item);
 	}
 	else {
-		SendMessageA(hwnd, LVM_SETITEM, 0, (LPARAM)&item);
+		SendMessageA(hwnd, LVM_SETITEM, NULL, (LPARAM)&item);
 	}
 
 	SendMessageA(hwnd, LVM_ENSUREVISIBLE, (WPARAM)(itemcount / headercount), true);
@@ -91,7 +91,7 @@ void SimpleListView::SetFunction(void (*vFunction)(SimpleWindow *sw)) {
 }
 
 void SimpleListView::Clear() {
-	SendMessageA(hwnd, LVM_DELETEALLITEMS, 0, 0);
+	SendMessageA(hwnd, LVM_DELETEALLITEMS, NULL, NULL);
 	itemcount = 0;
 }
 

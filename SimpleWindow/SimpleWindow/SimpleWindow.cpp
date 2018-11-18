@@ -223,7 +223,7 @@ void SimpleWindow::CheckBox(int iID, int X, int Y, const char *cText) {
 }
 
 void SimpleWindow::EditBox(int iID, int X, int Y, const char *cText, int iWidth, int iLine, bool bNumber) {
-	DWORD dwStyle = WS_CHILD | WS_VISIBLE | ES_LEFT | ES_AUTOHSCROLL | WS_BORDER;
+	DWORD dwStyle = WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | WS_BORDER;
 	int width = iWidth ? iWidth : GetWidth(cText) + 6;
 	int height = iLine ? iLine * 12 + 4 : GetHeight(cText) + 4;
 
@@ -245,11 +245,19 @@ void SimpleWindow::EditBox(int iID, int X, int Y, const char *cText, int iWidth,
 }
 
 void SimpleWindow::StaticText(int iID, int X, int Y, const char *cText, int iWidth, int iLine) {
-	DWORD dwStyle = WS_CHILD | WS_VISIBLE | ES_LEFT;
+	DWORD dwStyle = WS_CHILD | WS_VISIBLE;
 	int width = iWidth ? iWidth : GetWidth(cText);
 	int height = iLine ? iLine * 6 : GetHeight(cText);
 
 	if (CreateWindowExA(NULL, "STATIC", cText, dwStyle, X, Y, width, height, hWndSW, (HMENU)iID, hInstanceSW, NULL)) {
+		SetFont(iID);
+	}
+}
+
+void SimpleWindow::ComboBox(int iID, int X, int Y, int iWidth, int iHeight) {
+	DWORD dwStyle = WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST;
+
+	if (CreateWindowExA(NULL, "COMBOBOX", NULL, dwStyle, X, Y, iWidth, iHeight, hWndSW, (HMENU)iID, hInstanceSW, NULL)) {
 		SetFont(iID);
 	}
 }
@@ -293,6 +301,15 @@ void SimpleWindow::SetFunction(int iID, void(*vFunction)(SimpleWindow *sw)) {
 bool SimpleWindow::CheckBoxStatus(int iID) {
 	return IsDlgButtonChecked(hWndSW, iID);
 }
+
+void SimpleWindow::ComboBoxAddSel(int iID, const char *cText) {
+	SendDlgItemMessageA(hWndSW, iID, CB_ADDSTRING, NULL, (LPARAM)cText);
+}
+
+void SimpleWindow::ComboBoxSetSel(int iID, int index) {
+	SendDlgItemMessageA(hWndSW, iID, CB_SETCURSEL, index, NULL);
+}
+
 
 FunctionTable* SimpleWindow::FindFunction(int iID) {
 	FunctionTable *ft;

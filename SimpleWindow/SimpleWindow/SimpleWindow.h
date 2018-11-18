@@ -52,12 +52,15 @@ public:
 	void CheckBox(int iID, int X, int Y, const char *cText);
 	void EditBox(int iID, int X, int Y, const char *cText, int iWidth = 0, int iLine = 0, bool bNumber = false);
 	void StaticText(int iID, int X, int Y, const char *cText, int iWidth = 0, int iLine = 0);
+	void ComboBox(int iID, int X, int Y, int iWidth, int iHeight);
 
 	LRESULT ReadOnly(int iID, bool bReadOnly = true);
 	BOOL SetText(int iID, const char *cText);
 	void GetText(int iID, std::string &output);
 	void SetFunction(int iID, void (*vFunction)(SimpleWindow *sw));
 	bool CheckBoxStatus(int iID);
+	void ComboBoxAddSel(int iID, const char *cText);
+	void ComboBoxSetSel(int iID, int index);
 
 	/*
 		リストコントロール
@@ -91,7 +94,9 @@ public:
 class SimpleListView {
 private:
 	int itemcount;
-	//int GetItemCount();
+	/*
+	int GetItemCount();
+	*/
 
 public:
 	int id;

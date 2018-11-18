@@ -12,7 +12,8 @@ enum ID {
 	STATICTEXT_TEST,
 	EDITBOX_TEST2,
 	LISTVIEW_TEST,
-	EDITBOX_VIEWTEST
+	EDITBOX_VIEWTEST,
+	COMBOBOX_TEST
 };
 
 void ListView(SimpleWindow *sw) {
@@ -65,6 +66,9 @@ void CheckBox(SimpleWindow *sw) {
 	}
 }
 
+void ComboBox(SimpleWindow *sw) {
+}
+
 void CreateControls(SimpleWindow *sw) {
 	sw->EditBox(EDITBOX_TEST, 3, 3, NULL, 400 - 6, 10);
 	sw->CheckBox(CHECKBOX_TEST, 250, 133, "Šm’è");
@@ -90,6 +94,13 @@ void CreateControls(SimpleWindow *sw) {
 	slv->AddItem("test9");
 	sw->SetFunction(LISTVIEW_TEST, ListView);
 	sw->EditBox(EDITBOX_VIEWTEST, 400, 300, NULL, 400 - 6);
+
+	sw->ComboBox(COMBOBOX_TEST, 3, 300, 100, 20);
+	sw->SetFunction(COMBOBOX_TEST, ComboBox);
+	sw->ComboBoxAddSel(COMBOBOX_TEST, "A");
+	sw->ComboBoxAddSel(COMBOBOX_TEST, "B");
+	sw->ComboBoxAddSel(COMBOBOX_TEST, "C");
+	sw->ComboBoxSetSel(COMBOBOX_TEST, 1);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE/* hPrevInstance*/, LPSTR/* lpCmdLine*/, int/* nCmdShow*/) {
