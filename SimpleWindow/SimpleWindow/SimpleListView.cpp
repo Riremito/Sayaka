@@ -31,18 +31,6 @@ SimpleListView::~SimpleListView() {
 	}
 }
 
-SimpleListView* SimpleListView::FindByID(int iID) {
-	if (id == iID) {
-		return this;
-	}
-
-	if (next) {
-		return next->FindByID(iID);
-	}
-
-	return NULL;
-}
-
 void SimpleListView::AddHeader(const char *cText, int iWidth) {
 	LVCOLUMNA lvc;
 
@@ -100,18 +88,6 @@ bool SimpleListView::GetItem(int index, std::string &output) {
 
 void SimpleListView::SetFunction(void (*vFunction)(SimpleWindow *sw)) {
 	notify = vFunction;
-}
-
-SimpleListView* SimpleListView::FindByHWND(HWND hWnd) {
-	if (hwnd == hWnd) {
-		return this;
-	}
-
-	if (next) {
-		return next->FindByHWND(hWnd);
-	}
-
-	return NULL;
 }
 
 void SimpleListView::Clear() {

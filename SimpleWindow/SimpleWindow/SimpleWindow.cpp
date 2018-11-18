@@ -51,6 +51,10 @@ SimpleWindow::SimpleWindow(HINSTANCE hInstance, const char *cTitle, int iWidth, 
 }
 
 SimpleWindow::~SimpleWindow() {
+	if (functiontable) {
+		delete functiontable;
+	}
+
 	if (listview) {
 		delete listview;
 	}
@@ -58,7 +62,6 @@ SimpleWindow::~SimpleWindow() {
 
 LRESULT CALLBACK SimpleWindow::SimpleWindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) {
 	SimpleWindow *sw;
-	SimpleListView *slv;
 	NMHDR *nh;
 
 	switch (Msg) {
@@ -77,19 +80,26 @@ LRESULT CALLBACK SimpleWindow::SimpleWindowProc(HWND hWnd, UINT Msg, WPARAM wPar
 		// コントロールに関連付けた関数を呼び出す
 	case WM_COMMAND:
 		sw = (SimpleWindow *)GetWindowLongA(hWnd, GWL_USERDATA);
-		sw->idtable.Find(sw, LOWORD(wParam));
+		if (sw->functiontable) {
+			FunctionTable *ft = sw->FindFunction(LOWORD(wParam));
+			if (ft) {
+				if (ft->function) {
+					ft->function(sw);
+				}
+			}
+		}
 		break;
 
 	case WM_NOTIFY:
 		nh = (NMHDR *)lParam;
 		if (nh->code == NM_CLICK) {
-
 			sw = (SimpleWindow *)GetWindowLongA(hWnd, GWL_USERDATA);
-			slv = sw->FindListView(nh->hwndFrom);
-
-			if (slv) {
-				if (slv->notify) {
-					slv->notify(sw);
+			if (sw->listview) {
+				SimpleListView *slv = sw->FindListView(nh->hwndFrom);
+				if (slv) {
+					if (slv->notify) {
+						slv->notify(sw);
+					}
 				}
 			}
 		}
@@ -129,6 +139,7 @@ HWND SimpleWindow::GetHWND() {
 void SimpleWindow::InitControls() {
 	hDefaultCursor = LoadCursorA(NULL, IDC_ARROW);
 	hFontSW = CreateFontA(12, NULL, NULL, NULL, FW_NORMAL, NULL, NULL, NULL, SHIFTJIS_CHARSET, NULL, NULL, NULL, NULL, "MS Gothic");
+	functiontable = NULL;
 }
 
 void SimpleWindow::FixCursor(HWND hWnd, UINT Msg) {
@@ -266,70 +277,40 @@ void SimpleWindow::SetFunction(int iID, void(*vFunction)(SimpleWindow *sw)) {
 	if (listview) {
 		SimpleListView *slv = ListView(iID);
 		if (slv) {
-			slv->SetFunction(vFunction);
-			return;
+			return slv->SetFunction(vFunction);
 		}
 	}
-	idtable.Add(iID, vFunction);
+	if (!functiontable) {
+		functiontable = new FunctionTable(iID, vFunction);
+	}
+	else {
+		FunctionTable *ft;
+		for (ft = functiontable; ft->next; ft = ft->next);
+		ft->next = new FunctionTable(iID, vFunction);
+	}
 }
 
 bool SimpleWindow::CheckBoxStatus(int iID) {
 	return IsDlgButtonChecked(hWndSW, iID);
 }
 
-/*
-	コントロールテーブル
-*/
+FunctionTable* SimpleWindow::FindFunction(int iID) {
+	FunctionTable *ft;
 
-SimpleWindow::IDTable::IDTable() {
-	id = -1;
-	ft = NULL;
-	next = NULL;
-}
+	for (ft = functiontable; ft && ft->id != iID; ft = ft->next);
 
-SimpleWindow::IDTable::IDTable(int iID, void(*vFunction)(SimpleWindow *sw)) {
-	id = iID;
-	ft = vFunction;
-	next = NULL;
-}
-
-SimpleWindow::IDTable::~IDTable() {
-	if (next) {
-		delete next;
-	}
-}
-
-void SimpleWindow::IDTable::Add(int iID, void(*vFunction)(SimpleWindow *sw)) {
-	if (ft == NULL && id == -1 && next == NULL) {
-		id = iID;
-		ft = vFunction;
-	}
-	else {
-		if (next == NULL) {
-			next = new IDTable(iID, vFunction);
-		}
-		else {
-			return next->Add(iID, vFunction);
-		}
-	}
-}
-
-SimpleWindow::IDTable* SimpleWindow::IDTable::Find(SimpleWindow *sw, int iID) {
-	if (id == iID) {
-		ft(sw);
-		return this;
-	}
-	if (next) {
-		return next->Find(sw, iID);
-	}
-	return NULL;
+	return ft;
 }
 
 /*
 	ListView
 */
 SimpleListView* SimpleWindow::FindListView(HWND hWnd) {
-	return listview ? listview->FindByHWND(hWnd) : listview;
+	SimpleListView *slv;
+
+	for (slv = listview; slv && slv->hwnd != hWnd; slv = slv->next);
+
+	return slv;
 }
 
 SimpleListView* SimpleWindow::ListView(int iID, int X, int Y, int iWidth, int iHeight) {
@@ -339,11 +320,16 @@ SimpleListView* SimpleWindow::ListView(int iID, int X, int Y, int iWidth, int iH
 		return listview;
 	}
 	else {
-		listview->next = new SimpleListView(hWndSW, iID, X, Y, iWidth, iHeight);
-		return listview->next;
+		SimpleListView *slv;
+		for (slv = listview; slv->next; slv = slv->next);
+		return slv->next = new SimpleListView(hWndSW, iID, X, Y, iWidth, iHeight);
 	}
 }
 
 SimpleListView* SimpleWindow::ListView(int iID) {
-	return listview ? listview->FindByID(iID) : listview;
+	SimpleListView *slv;
+
+	for (slv = listview; slv && slv->id != iID; slv = slv->next);
+
+	return slv;
 }

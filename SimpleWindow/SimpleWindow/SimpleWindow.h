@@ -13,6 +13,7 @@
 
 class SimpleWindow;
 class SimpleListView;
+class FunctionTable;
 
 class SimpleWindow {
 	/*
@@ -37,30 +38,15 @@ public:
 private:
 	HFONT hFontSW;
 	HCURSOR hDefaultCursor;
-
-	int iID_test;
-	void (*vFunction_test)(SimpleWindow *sw);
+	FunctionTable* functiontable;
 
 	void InitControls();
 	void FixCursor(HWND hWnd, UINT Msg);
 	void SetFont(int iID);
 	int GetWidth(const char *cText);
 	int GetHeight(const char *cText);
+	FunctionTable* FindFunction(int iID);
 
-	class IDTable {
-	private:
-		int id;
-		void (*ft)(SimpleWindow *sw);
-		IDTable *next;
-
-	public:
-		IDTable();
-		IDTable(int iID, void (*vFunction)(SimpleWindow *sw));
-		~IDTable();
-		void Add(int iID, void (*vFunction)(SimpleWindow *sw));
-		IDTable* Find(SimpleWindow *sw, int iID);
-	} idtable;
-	
 public:
 	void Button(int iID, int X, int Y, const char *cText, int iWidth = 0, int iHeight = 0);
 	void CheckBox(int iID, int X, int Y, const char *cText);
@@ -84,17 +70,32 @@ public:
 	SimpleListView* ListView(int iID);
 };
 
+
+/*
+	関数テーブル
+*/
+class FunctionTable {
+public:
+	int id;
+	void (*function)(SimpleWindow *sw);
+	FunctionTable* next;
+
+	FunctionTable(int iID, void(*vFunction)(SimpleWindow *sw));
+	~FunctionTable();
+};
+
+
 /*
 	リストコントロール
 */
 class SimpleListView {
 private:
-	int id;
-	HWND hwnd;
 	int itemcount;
 	//int GetItemCount();
 
 public:
+	int id;
+	HWND hwnd;
 	int headercount;
 	SimpleListView *next;
 	void (*notify)(SimpleWindow *sw);
@@ -102,12 +103,10 @@ public:
 	SimpleListView(HWND hWndParent, int iID, int X, int Y, int iWidth, int iHeight);
 	~SimpleListView();
 
-	SimpleListView* FindByID(int iID);
 	void AddHeader(const char *cText, int iWidth);
 	void AddItem(const char *cText);
 	bool GetItem(int index, std::string &output);
 	void SetFunction(void (*vFunction)(SimpleWindow *sw));
-	SimpleListView* FindByHWND(HWND hWnd);
 	void Clear();
 };
 
